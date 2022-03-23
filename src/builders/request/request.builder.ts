@@ -138,7 +138,8 @@ export class RequestBuilder {
   ): IRequestParseMethod[] {
     // foreach method
     return Object.keys(methods).map((method) => {
-      const { parameters, requestBody, responses } = methods[method];
+      const { parameters, requestBody, responses, description } =
+        methods[method];
 
       // request `path` or `query` types
       const reqParams = this.parseRequestParameters(parameters);
@@ -151,6 +152,7 @@ export class RequestBuilder {
 
       return {
         method,
+        description,
         reqParams: reqParams.filter((k) => k),
         reqBody,
         resType,
@@ -216,6 +218,7 @@ export class RequestBuilder {
           controller,
           url,
           name,
+          description: method.description,
           method: method.method,
           reqType: iname,
           resTypes: method.resType,

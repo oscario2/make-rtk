@@ -17,6 +17,8 @@ export interface IRequestBuilderOptions {
 export interface IRequestParseMethod {
   /** `get` or `post` etc */
   method: string;
+  /** description of endpoint */
+  description: string;
   /** request properties type */
   reqParams: IFace.Property[];
   /** request body type */
@@ -30,6 +32,8 @@ export interface IRequestInfo {
   controller: string;
   /** endpoint url - `/server/get-all` */
   url: string;
+  /** description of endpoint */
+  description: string;
   /** query name */
   name: string;
   /** `get` or `post` etc */

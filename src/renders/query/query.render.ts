@@ -12,14 +12,22 @@ export class QueryRender {
    * @todo split by controller
    * @param namespace to prefix interface with
    * @param requests build request endpoints and interfaces
+   * @param controllerOverride optional `controller` name to unify all endpoints under the same `createApi`
    */
-  public renderQueries(namespace: string, requests: IRequestInfo[]) {
+  public renderQueries(
+    namespace: string,
+    requests: IRequestInfo[],
+    controllerOverride?: string,
+  ) {
     const queries = {} as { [controller: string]: string[] };
 
     // process request args
     requests.forEach((req) => {
-      const { controller, url, name, method, iface } = req;
-      if (!queries[controller]) queries[req.controller] = [];
+      const { controller, url, name, description, method, iface } = req;
+      // by endpoint or override
+      const _controller = controllerOverride || controller;
+
+      if (!queries[_controller]) queries[_controller] = [];
 
       // checks
       if (!name) {
@@ -53,6 +61,7 @@ export class QueryRender {
       const renderQueries = this.template.render({
         url: _url,
         name,
+        description,
         method,
         args,
         reqType,
@@ -60,7 +69,7 @@ export class QueryRender {
       });
 
       // add to `controller`
-      queries[controller].push(renderQueries);
+      queries[_controller].push(renderQueries);
     });
 
     return queries;

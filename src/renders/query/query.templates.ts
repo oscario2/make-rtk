@@ -5,6 +5,8 @@ export interface IQueryTemplate {
   name: string;
   /** endpoint url - `/server/get-all` */
   url: string;
+  /** description of endpoint */
+  description: string;
   /** `get` or `post` etc */
   method: string;
   /** unique names of e.g `args`, `query` or `header` etc */
@@ -19,6 +21,7 @@ export class QueryTemplate {
   private withArgs(props: IQueryTemplate) {
     const template = `
     /**
+    * {{description}}
     * @{{method}} \`{{{url}}}\`
     * @req {@linkcode {{{reqType}}}}
     * @res {@linkcode {{{resType}}}}
@@ -39,6 +42,7 @@ export class QueryTemplate {
   private withoutArgs(props: IQueryTemplate) {
     const template = `
     /**
+    * {{description}}
     * @{{method}} \`{{{url}}}\`
     * @req {@link void}
     * @res {@link {{{resType}}}}

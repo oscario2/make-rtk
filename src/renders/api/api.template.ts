@@ -16,12 +16,13 @@ export interface IApiTemplateCreateApi {
 export class ApiTemplate {
   public createApi(props: IApiTemplateCreateApi) {
     const template = `
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     import { createApi } from '@reduxjs/toolkit/query/react'
     import { {{typesNameSpace}} } from "./types"
     import baseQuery from '{{{baseFile}}}'
 
     /** @see https://redux-toolkit.js.org/rtk-query/usage/queries#hook-types */
-    export const {{{controller}}}Api = createApi({
+    const {{{controller}}}Api = createApi({
       reducerPath: '{{{controller}}}',
       baseQuery: baseQuery('{{{baseUrl}}}'),
       endpoints: (build) => ({
@@ -29,8 +30,29 @@ export class ApiTemplate {
         {{{.}}}
         {{/queries}}
       }),
-    })`.trim();
+    });
+    export default {{{controller}}}Api
+    `.trim();
 
     return mustache.render(template, props);
+  }
+
+  /**
+   *
+   */
+  public createIndex(controllers: string[]) {
+    const template = `
+    {{#controllers}}
+    import {{{.}}} from "./{{{.}}}.api"
+    {{/controllers}}
+
+    export const api = {
+    {{#controllers}}
+      {{{.}}},
+    {{/controllers}}
+    }
+    `;
+
+    return mustache.render(template, { controllers });
   }
 }

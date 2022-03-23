@@ -14,7 +14,9 @@ import { QueryRender } from './renders/query/query.render';
 export interface IMakeRtkOptions {
   /** api url for `createApi` to query */
   baseUrl: string;
-  /** swagger url  */
+  /** unify all endpoints under one `controller` */
+  controllerOverride?: string;
+  /** swagger url `https://` or `file://`  */
   swagger: string;
   /** write swagger JSON to disk */
   debugJson?: boolean;
@@ -40,7 +42,9 @@ export class MakeRtk {
    * @returns
    */
   private async fetchSwagger() {
-    return await fetchJson<OpenApi.Document>(this.options.swagger);
+    return await fetchJson<OpenApi.Document | OpenApi.Mps>(
+      this.options.swagger,
+    );
   }
 
   /**
@@ -102,11 +106,17 @@ export class MakeRtk {
    * write `createApi` to file
    */
   private writeApi(req: IRequestInfo[]) {
-    const { typesNamepace, baseFile, baseUrl, outFolder } = this.options;
+    const {
+      typesNamepace,
+      controllerOverride: controller,
+      baseFile,
+      baseUrl,
+      outFolder,
+    } = this.options;
 
     // render `queries`
     const queryRender = new QueryRender();
-    const queries = queryRender.renderQueries(typesNamepace, req);
+    const queries = queryRender.renderQueries(typesNamepace, req, controller);
 
     // correct import of `baseFile`
     const parse = path.parse(baseFile);
@@ -116,7 +126,7 @@ export class MakeRtk {
       // `base.ts` to `base`
       .replace(parse.base, parse.name);
 
-    // fix import
+    // fix `fetchBaseQuery` import
     baseImport =
       baseImport.startsWith('/') || baseImport.startsWith('.')
         ? baseImport
@@ -132,31 +142,36 @@ export class MakeRtk {
     );
 
     // prettify + write each `createApi`
-    const index = Object.keys(createApi)
-      .map((controller) => {
-        if (!controller) return;
+    const controllers = Object.keys(createApi).filter((k) => k);
+    controllers.forEach((controller) => {
+      if (!controller) return;
 
-        const result = this.stringUtils.prettify(
-          createApi[controller],
-          this.options.prettier,
-        );
+      const result = this.stringUtils.prettify(
+        createApi[controller],
+        this.options.prettier,
+      );
 
-        // write api for `controller`
-        fs.writeFileSync(`${this.getOutPath()}/${controller}.api.ts`, result);
-
-        // return export
-        return `export { ${controller}Api } from './${controller}.api'`;
-      })
-      .filter((k) => k);
+      // write api for `controller`
+      fs.writeFileSync(`${this.getOutPath()}/${controller}.api.ts`, result);
+    });
 
     // write `index.ts` to export all `createApi`
-    fs.writeFileSync(`${this.getOutPath()}/index.ts`, index.join('\n'));
+    let index = apiRender.renderIndex(controllers);
+    index = this.stringUtils.prettify(index, this.options.prettier);
+    fs.writeFileSync(`${this.getOutPath()}/index.ts`, index);
   }
 
   public render() {
     this.fetchSwagger().then((swagger) => {
+      let document = {} as OpenApi.Document;
+
+      // format
+      if ((swagger as OpenApi.Mps).specification)
+        document = (swagger as OpenApi.Mps).specification;
+      else document = swagger as OpenApi.Document;
+
       // invalid swagger
-      if (!swagger.paths)
+      if (!document.paths)
         throw new Error(
           `${this.options.swagger} is not a swagger JSON document`,
         );
@@ -170,7 +185,7 @@ export class MakeRtk {
       }
 
       // build + write `interfaces` to file
-      const { req, res } = this.buildInterfaces(swagger);
+      const { req, res } = this.buildInterfaces(document);
       this.writeInterfaces(req, res);
 
       // build + write `createApi` to file

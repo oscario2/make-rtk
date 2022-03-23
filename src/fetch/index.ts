@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { OutgoingHttpHeaders } from 'http2';
 import { request, RequestOptions } from 'https';
 import { Deferred } from './deferred';
@@ -8,6 +9,12 @@ export const fetchJson = async <T = object>(
 ) => {
   const { hostname, pathname: path, protocol } = new URL(url);
   const port = protocol == 'https:' ? 443 : 80;
+
+  if (protocol === 'file:') {
+    const path = process.cwd() + '/' + url.split('file://').pop();
+    const read = JSON.parse(fs.readFileSync(path, 'utf-8')) as T;
+    return new Promise<T>((resolve) => resolve(read));
+  }
 
   const opt: RequestOptions = {
     method: 'GET',

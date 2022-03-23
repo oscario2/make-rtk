@@ -9,6 +9,13 @@ export class ApiRender {
   }
 
   /**
+   *
+   */
+  public renderIndex(controllers: string[]) {
+    return this.apiTemplate.createIndex(controllers);
+  }
+
+  /**
    * @param typesNameSpace types.ts `namespace`
    * @param baseUrl api url for `createApi` to query
    * @param baseFile base file name to import `baseQuery` from

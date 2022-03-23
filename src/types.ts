@@ -50,6 +50,8 @@ export namespace OpenApi {
     enum?: (string | number)[];
     /** e.g 'date-time' if */
     format?: string;
+    /** anyOf type */
+    anyOf?: PropertyType[];
   }
 
   export interface Schema {
@@ -94,6 +96,7 @@ export namespace OpenApi {
   export interface Method {
     operationId: string;
     parameters: RequestParameter[];
+    description: string;
     requestBody: RequestBody;
     responses: Response;
     tags: string[];
@@ -106,5 +109,11 @@ export namespace OpenApi {
   export interface Document {
     paths: Paths;
     components: Components;
+  }
+
+  export interface Mps {
+    mpsVersion: string;
+    configuration: Record<string, unknown>;
+    specification: Document;
   }
 }
