@@ -12,6 +12,7 @@ export class InterfaceTemplate {
     export namespace {{{namespace}}} {
       {{#ifaces}}
       {{{.}}}
+      
       {{/ifaces}} 
     }`.trim();
 

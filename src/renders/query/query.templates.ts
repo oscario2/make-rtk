@@ -40,10 +40,10 @@ export class QueryTemplate {
     const template = `
     /**
     * @{{method}} \`{{{url}}}\`
-    * @req {@link {{{reqType}}}}
+    * @req {@link void}
     * @res {@link {{{resType}}}}
     */
-    {{name}}: build.query<{{{resType}}}, {{{reqType}}}>({
+    {{name}}: build.query<{{{resType}}}, void>({
       query: () => ({
         url: '{{{url}}}',
         method: '{{method}}',

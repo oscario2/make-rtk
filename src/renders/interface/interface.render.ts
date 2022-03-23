@@ -66,9 +66,11 @@ export class InterfaceRender {
     namespace: string,
     ifaces: IFace.Output[],
   ): string {
-    const rendered = ifaces.map((iface) => {
-      return this.renderInterface(iface);
-    });
+    const rendered = ifaces
+      .map((iface) => {
+        return this.renderInterface(iface);
+      })
+      .filter((k) => k);
     return this.template.withNamespace(namespace, rendered);
   }
 }

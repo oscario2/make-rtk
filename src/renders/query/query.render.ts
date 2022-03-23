@@ -46,9 +46,12 @@ export class QueryRender {
         ? `${namespace}.${resType}`
         : resType || 'void';
 
+      // process `path` args for url
+      let _url = url.replaceAll('{', '${args.');
+
       // render
       const renderQueries = this.template.render({
-        url,
+        url: _url,
         name,
         method,
         args,

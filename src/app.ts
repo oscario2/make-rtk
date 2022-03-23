@@ -145,7 +145,7 @@ export class MakeRtk {
         fs.writeFileSync(`${this.getOutPath()}/${controller}.api.ts`, result);
 
         // return export
-        return `export { ${controller}Api } from "./${controller}.api"`;
+        return `export { ${controller}Api } from './${controller}.api'`;
       })
       .filter((k) => k);
 
