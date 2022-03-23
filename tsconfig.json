@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".",
+      "moduleResolution": "node",
+      "types": ["node"],
+      "removeComments": false,
+      "sourceMap": true,
+      "target": "ESNext",
+      "outDir": "lib",
+      "declaration": true,
+      "declarationDir": "types",
+      "emitDeclarationOnly": true,
+      "strict": true,
+      "module": "esnext",
+      "noEmitOnError": true,
+      "lib": ["DOM", "ESNext"],
+      "esModuleInterop": false,
+      "allowSyntheticDefaultImports": true,
+    },
+    "include": ["src", "test", "test.ts"],
+    "ts-node": {
+      "require": ["tsconfig-paths/register"],
+      "compilerOptions": {
+        "module": "commonjs"
+      }
+    }
+  }

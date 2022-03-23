@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+      "**/.git": true,
+      "**/.gitkeep": true,
+      "node_modules": true,
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  }
+  
