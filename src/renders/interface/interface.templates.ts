@@ -8,6 +8,7 @@ export class InterfaceTemplate {
    */
   public withNamespace(namespace: string, ifaces: string[]) {
     const template = `
+    /* eslint-disable */
     export namespace {{{namespace}}} {
       {{#ifaces}}
       {{{.}}}

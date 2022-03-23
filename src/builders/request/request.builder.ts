@@ -208,8 +208,8 @@ export class RequestBuilder {
         let controller = url.split('/')[1];
         controller = this.stringUtils.hyphenToUpperCase(controller);
 
-        // server > serverGet
-        const name = queryName + this.stringUtils.upFirstLetter(method.method);
+        // `query` name = request `interface` name
+        const name = this.stringUtils.lowFirstLetter(iname.substring(1));
 
         // request info
         return {

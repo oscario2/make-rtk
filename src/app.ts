@@ -110,33 +110,47 @@ export class MakeRtk {
 
     // correct import of `baseFile`
     const parse = path.parse(baseFile);
-    let baseFileRelative = path
+    let baseImport = path
       // relative path to `fetchBaseQuery`
       .relative(outFolder, baseFile)
       // `base.ts` to `base`
       .replace(parse.base, parse.name);
+
+    // fix import
+    baseImport =
+      baseImport.startsWith('/') || baseImport.startsWith('.')
+        ? baseImport
+        : './' + baseImport;
 
     // render `createApi`
     const apiRender = new ApiRender();
     const createApi = apiRender.renderCreateApi(
       typesNamepace,
       baseUrl,
-      baseFileRelative,
+      baseImport,
       queries,
     );
 
     // prettify + write each `createApi`
-    Object.keys(createApi).forEach((controller) => {
-      if (!controller) return;
+    const index = Object.keys(createApi)
+      .map((controller) => {
+        if (!controller) return;
 
-      const result = this.stringUtils.prettify(
-        createApi[controller],
-        this.options.prettier,
-      );
+        const result = this.stringUtils.prettify(
+          createApi[controller],
+          this.options.prettier,
+        );
 
-      // write api for `controller`
-      fs.writeFileSync(`${this.getOutPath()}/${controller}.api.ts`, result);
-    });
+        // write api for `controller`
+        fs.writeFileSync(`${this.getOutPath()}/${controller}.api.ts`, result);
+
+        // return export
+        return `export { ${controller}Api } from "./${controller}.api"`;
+      })
+      .filter((k) => k);
+
+    // write `index.ts` to export all `createApi`
+    fs.writeFileSync(`${this.getOutPath()}/index.ts`, index.join('\n'));
   }
 
   public render() {

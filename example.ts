@@ -5,7 +5,7 @@ new MakeRtk({
   baseUrl: 'https://api.pentest.moralis.io',
   swagger: 'https://api.pentest.moralis.io/documentation-json',
   debugJson: true,
-  baseFile: '/example/base.ts',
+  baseFile: '/api/base.ts',
   typesNamepace: 'MApi',
   outFolder: '/api',
   prettier: JSON.parse(fs.readFileSync('./.prettierrc', 'utf8')),

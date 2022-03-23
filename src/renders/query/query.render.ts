@@ -32,7 +32,7 @@ export class QueryRender {
 
       // get each unique redux arg key
       const args = [...new Set(Object.keys(iface.nested))];
-      if (iface.props.length > 1) args.push(iface.props[0].name);
+      if (iface.props.length === 1) args.push(iface.props[0].name);
 
       // append namespace if `request` type is an `interface`
       let reqType = req.reqType;
