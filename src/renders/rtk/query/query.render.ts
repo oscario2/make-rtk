@@ -1,5 +1,6 @@
 import { QueryTemplate } from './query.templates';
 import { IRequestInfo } from 'src/builders/request/request.types';
+import { IMakeRtkProps } from 'src/app';
 
 export class QueryRender {
   private template: QueryTemplate;
@@ -12,12 +13,11 @@ export class QueryRender {
    * @todo split by controller
    * @param namespace to prefix interface with
    * @param requests build request endpoints and interfaces
-   * @param controllerOverride optional `controller` name to unify all endpoints under the same `createApi`
    */
   public renderQueries(
     namespace: string,
     requests: IRequestInfo[],
-    controllerOverride?: string,
+    props: IMakeRtkProps,
   ) {
     const queries = {} as { [controller: string]: string[] };
 
@@ -25,7 +25,7 @@ export class QueryRender {
     requests.forEach((req) => {
       const { controller, url, name, description, method, iface } = req;
       // by endpoint or override
-      const _controller = controllerOverride || controller;
+      const _controller = props.controllerOverride || controller;
 
       if (!queries[_controller]) queries[_controller] = [];
 
@@ -59,7 +59,9 @@ export class QueryRender {
 
       // render
       const renderQueries = this.template.render({
-        url: _url,
+        url: props.wrapQuery
+          ? 'props.fetchUrl(`' + _url + '`)'
+          : '`' + _url + '`',
         name,
         description,
         method,

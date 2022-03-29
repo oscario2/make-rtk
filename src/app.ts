@@ -8,10 +8,12 @@ import { IFace, OpenApi } from './types';
 import { InterfaceRender } from './renders/interface/interface.render';
 import { StringUtils } from './utils/string.utils';
 import { IRequestInfo } from './builders/request/request.types';
-import { ApiRender } from './renders/api/api.render';
-import { QueryRender } from './renders/query/query.render';
+import { ApiRender } from './renders/rtk/api/api.render';
+import { QueryRender } from './renders/rtk/query/query.render';
 
-export interface IMakeRtkOptions {
+export interface IMakeRtkProps {
+  /** name of project for output e.g `admin.types.ts` */
+  projectName: string;
   /** api url for `createApi` to query */
   baseUrl: string;
   /** unify all endpoints under one `controller` */
@@ -28,12 +30,14 @@ export interface IMakeRtkOptions {
   outFolder: string;
   /** optional prettier config to format output with */
   prettier?: prettier.Config;
+  /** wrap query url in `props.fetchUrl` to allow overriding `baseUrl` for each individual query */
+  wrapQuery?: boolean;
 }
 
 export class MakeRtk {
   private stringUtils: StringUtils;
 
-  constructor(private options: IMakeRtkOptions) {
+  constructor(private props: IMakeRtkProps) {
     this.stringUtils = new StringUtils();
   }
 
@@ -42,9 +46,7 @@ export class MakeRtk {
    * @returns
    */
   private async fetchSwagger() {
-    return await fetchJson<OpenApi.Document | OpenApi.Mps>(
-      this.options.swagger,
-    );
+    return await fetchJson<OpenApi.Document | OpenApi.Mps>(this.props.swagger);
   }
 
   /**
@@ -52,7 +54,7 @@ export class MakeRtk {
    * @returns
    */
   private getOutPath() {
-    const path = `${process.cwd()}/${this.options.outFolder}`;
+    const path = `${process.cwd()}/${this.props.outFolder}`;
     fs.mkdirSync(path, { recursive: true });
     return path;
   }
@@ -88,35 +90,30 @@ export class MakeRtk {
     // render
     const ifaces = req.map((r) => r.iface).concat(res);
     const ifaceRender = iwriter.renderInterfaceWithNamespace(
-      this.options.typesNamepace,
+      this.props.typesNamepace,
       ifaces,
     );
 
     // prettify
-    const result = this.stringUtils.prettify(
-      ifaceRender,
-      this.options.prettier,
-    );
+    const result = this.stringUtils.prettify(ifaceRender, this.props.prettier);
 
     // write types
-    fs.writeFileSync(this.getOutPath() + '/types.ts', result);
+    fs.writeFileSync(
+      this.getOutPath() + `/${this.props.projectName}.types.ts`,
+      result,
+    );
   }
 
   /**
    * write `createApi` to file
    */
   private writeApi(req: IRequestInfo[]) {
-    const {
-      typesNamepace,
-      controllerOverride: controller,
-      baseFile,
-      baseUrl,
-      outFolder,
-    } = this.options;
+    const { typesNamepace, baseFile, baseUrl, outFolder, projectName } =
+      this.props;
 
     // render `queries`
     const queryRender = new QueryRender();
-    const queries = queryRender.renderQueries(typesNamepace, req, controller);
+    const queries = queryRender.renderQueries(typesNamepace, req, this.props);
 
     // correct import of `baseFile`
     const parse = path.parse(baseFile);
@@ -138,6 +135,7 @@ export class MakeRtk {
       typesNamepace,
       baseUrl,
       baseImport,
+      projectName,
       queries,
     );
 
@@ -148,7 +146,7 @@ export class MakeRtk {
 
       const result = this.stringUtils.prettify(
         createApi[controller],
-        this.options.prettier,
+        this.props.prettier,
       );
 
       // write api for `controller`
@@ -157,7 +155,7 @@ export class MakeRtk {
 
     // write `index.ts` to export all `createApi`
     let index = apiRender.renderIndex(controllers);
-    index = this.stringUtils.prettify(index, this.options.prettier);
+    index = this.stringUtils.prettify(index, this.props.prettier);
     fs.writeFileSync(`${this.getOutPath()}/index.ts`, index);
   }
 
@@ -172,12 +170,10 @@ export class MakeRtk {
 
       // invalid swagger
       if (!document.paths)
-        throw new Error(
-          `${this.options.swagger} is not a swagger JSON document`,
-        );
+        throw new Error(`${this.props.swagger} is not a swagger JSON document`);
 
       // write swagger json
-      if (this.options.debugJson) {
+      if (this.props.debugJson) {
         fs.writeFileSync(
           process.cwd() + '/swagger.json',
           JSON.stringify(swagger, null, 3),

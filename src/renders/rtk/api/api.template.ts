@@ -1,12 +1,15 @@
 import * as mustache from 'mustache';
+import { IMakeRtkProps } from 'src/app';
 
 export interface IApiTemplateCreateApi {
   /** types.ts `namespace` */
-  typesNameSpace: string;
+  typesNameSpace: IMakeRtkProps['typesNamepace'];
   /** api url for `createApi` to query */
-  baseUrl: string;
+  baseUrl: IMakeRtkProps['baseUrl'];
   /** base file name to import `baseQuery` from */
-  baseFile: string;
+  baseFile: IMakeRtkProps['baseFile'];
+  /** name of project for output e.g `admin.types.ts` */
+  projectName: IMakeRtkProps['projectName'];
   /** endpoint controller name */
   controller: string;
   /** rendered queries for `controller` */
@@ -18,8 +21,8 @@ export class ApiTemplate {
     const template = `
     /* eslint-disable @typescript-eslint/no-unused-vars */
     import { createApi } from '@reduxjs/toolkit/query/react'
-    import { {{typesNameSpace}} } from "./types"
-    import baseQuery from '{{{baseFile}}}'
+    import { {{{typesNameSpace}}} } from "./types/{{{projectName}}}.types.ts"
+    import props from '{{{baseFile}}}'
 
     /** @see https://redux-toolkit.js.org/rtk-query/usage/queries#hook-types */
     const {{{controller}}}Api = createApi({

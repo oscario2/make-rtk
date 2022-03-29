@@ -19,12 +19,14 @@ export class ApiRender {
    * @param typesNameSpace types.ts `namespace`
    * @param baseUrl api url for `createApi` to query
    * @param baseFile base file name to import `baseQuery` from
+   * @param projectName name to import types from
    * @param queries rendered queries with `controller` as key
    */
   public renderCreateApi(
     typesNameSpace: string,
     baseUrl: string,
     baseFile: string,
+    projectName: string,
     queries: Record<string, string[]>,
   ) {
     const apis = {} as Record<string, string>;
@@ -34,6 +36,7 @@ export class ApiRender {
         typesNameSpace,
         baseUrl,
         baseFile,
+        projectName,
         controller,
         queries: queries[controller],
       });

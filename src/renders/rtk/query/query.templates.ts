@@ -22,14 +22,14 @@ export class QueryTemplate {
     const template = `
     /**
     * {{description}}
-    * @{{method}} \`{{{url}}}\`
+    * @{{method}} {{{url}}}
     * @req {@linkcode {{{reqType}}}}
     * @res {@linkcode {{{resType}}}}
     * @in \`{ {{#args}}{{{.}}}{{/args}} }\`
     */
     {{name}}: build.query<{{{resType}}}, {{{reqType}}}>({
       query: ({ {{#args}}{{{.}}},{{/args}} }) => ({
-        url: \`{{{url}}}\`,
+        url: {{{url}}},
         method: '{{method}}',
         {{#args}}
         {{{.}}},
@@ -43,13 +43,13 @@ export class QueryTemplate {
     const template = `
     /**
     * {{description}}
-    * @{{method}} \`{{{url}}}\`
+    * @{{method}} {{{url}}}
     * @req {@link void}
     * @res {@link {{{resType}}}}
     */
     {{name}}: build.query<{{{resType}}}, void>({
       query: () => ({
-        url: '{{{url}}}',
+        url: {{{url}}},
         method: '{{method}}',
       }),
     }),`;
