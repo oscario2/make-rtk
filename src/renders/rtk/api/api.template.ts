@@ -21,13 +21,13 @@ export class ApiTemplate {
     const template = `
     /* eslint-disable @typescript-eslint/no-unused-vars */
     import { createApi } from '@reduxjs/toolkit/query/react'
-    import { {{{typesNameSpace}}} } from "./types/{{{projectName}}}.types.ts"
+    import { {{{typesNameSpace}}} } from "./types/{{{projectName}}}.types"
     import props from '{{{baseFile}}}'
 
     /** @see https://redux-toolkit.js.org/rtk-query/usage/queries#hook-types */
     const {{{controller}}}Api = createApi({
       reducerPath: '{{{controller}}}',
-      baseQuery: baseQuery('{{{baseUrl}}}'),
+      baseQuery: props.baseQuery('{{{baseUrl}}}'),
       endpoints: (build) => ({
         {{#queries}}
         {{{.}}}

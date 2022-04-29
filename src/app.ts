@@ -115,6 +115,7 @@ export class MakeRtk {
     const queryRender = new QueryRender();
     const queries = queryRender.renderQueries(typesNamepace, req, this.props);
 
+    /*
     // correct import of `baseFile`
     const parse = path.parse(baseFile);
     let baseImport = path
@@ -128,13 +129,14 @@ export class MakeRtk {
       baseImport.startsWith('/') || baseImport.startsWith('.')
         ? baseImport
         : './' + baseImport;
+    */
 
     // render `createApi`
     const apiRender = new ApiRender();
     const createApi = apiRender.renderCreateApi(
       typesNamepace,
       baseUrl,
-      baseImport,
+      baseFile.replace('.ts', ''),
       projectName,
       queries,
     );

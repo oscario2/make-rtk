@@ -27,7 +27,7 @@ export class QueryTemplate {
     * @res {@linkcode {{{resType}}}}
     * @in \`{ {{#args}}{{{.}}}{{/args}} }\`
     */
-    {{name}}: build.query<{{{resType}}}, {{{reqType}}}>({
+    {{name}}: build.{{{type}}}<{{{resType}}}, {{{reqType}}}>({
       query: ({ {{#args}}{{{.}}},{{/args}} }) => ({
         url: {{{url}}},
         method: '{{method}}',
@@ -36,7 +36,8 @@ export class QueryTemplate {
         {{/args}}
       }),
     }),`.trim();
-    return mustache.render(template, props);
+    const type = props.method === 'get' ? 'query' : 'mutation';
+    return mustache.render(template, { ...props, ...{ type } });
   }
 
   private withoutArgs(props: IQueryTemplate) {
@@ -47,13 +48,14 @@ export class QueryTemplate {
     * @req {@link void}
     * @res {@link {{{resType}}}}
     */
-    {{name}}: build.query<{{{resType}}}, void>({
+    {{name}}: build.{{{type}}}<{{{resType}}}, void>({
       query: () => ({
         url: {{{url}}},
         method: '{{method}}',
       }),
     }),`;
-    return mustache.render(template, props);
+    const type = props.method === 'get' ? 'query' : 'mutation';
+    return mustache.render(template, { ...props, ...{ type } });
   }
 
   /**
